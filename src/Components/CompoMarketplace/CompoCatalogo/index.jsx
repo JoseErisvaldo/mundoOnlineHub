@@ -72,7 +72,7 @@ console.log(cursosTecnologia);
           <div className="">Por<span className="font-semibold" > {item.vendedor}</span> </div>
           <h4 className="font-semibold text-base md:text-lg">R$ {item.price}</h4>
         </div>
-        <button className="bg-green-500 rounded h-10 text-white hover:bg-green-400">Add to cart</button>
+        <button className="bg-green-500 rounded h-10 text-white hover:bg-green-400">Adicionar ao carrinho</button>
       </div>
       ))}
       

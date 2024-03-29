@@ -57,7 +57,7 @@ console.log(cursosTecnologia);
 
 
   return(
-    <div className=" grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4 md:p-6">
+    <div className="  grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4 md:p-6">
       {cursosTecnologia.map((item) => (
         <div className="grid gap-2 border-2 p-2" key={item.title}>
         <img

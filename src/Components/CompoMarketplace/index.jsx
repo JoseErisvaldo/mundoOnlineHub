@@ -16,7 +16,7 @@ export default function CompoMarketplace () {
   ] 
 
   return(
-    <div className="bg-white p-8 w-full">
+    <div className=" bg-white p-8 w-full">
       <Title title={'Mais vendidos do Marketplace'}/>
       <div className="m-5 flex gap-1 items-center w-full">
         <div className="border-2 w-full p-2 ">

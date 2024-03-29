@@ -4,6 +4,9 @@ import { Link } from "react-router-dom";
 import GenericForm from "../UIComponents/Form/GenericForm";
 import Table from "../UIComponents/Table/table";
 import Title from "../UIComponents/Title/Title";
+import NavBar from "../Navigation/NavBar";
+import FotterTable from "../UIComponents/FotterTable";
+import Guide from "../UIComponents/Guide";
 
 
 
@@ -48,21 +51,17 @@ export default function CompoProducts () {
   const data = [
     { NOME: 'React', PREÇO: 'R$ 50,00', STATUS: 'Ativo' }
   ];
-  let statusTable = 'Ativo'
-
 
   return(
     <div className="bg-white p-8 w-full">
-      <div className="mb-6 flex justify-between">
+      <div className="mb-2 flex justify-between">
         <Title title={'Produtos'} />
         <button className="bg-green-500 p-3 rounded text-white">Criar produto</button>
       </div>
-      <div>
-        <div className="mb-4 flex gap-3">
-          <button className=" bg-slate-600 hover:bg-slate-500 text-white p-2 rounded">Meus produtos</button>
-          <button className=" bg-slate-600 hover:bg-slate-500 text-white p-2 rounded" >Minhas co-produções</button>
-          <button className=" bg-slate-600 hover:bg-slate-500 text-white p-2 rounded" >Minhas afiliações</button>
-        </div>
+      <div className="flex gap-3 mb-6">
+        <NavBar titleNavBar={'Meus produtos'} />
+        <NavBar titleNavBar={'Minhas co-produções'} />
+        <NavBar titleNavBar={'Minhas afiliações'} />
       </div>
 
       
@@ -80,23 +79,8 @@ export default function CompoProducts () {
       <h1>Exemplo de Tabela</h1>
         <Table data={data} />
       </div>
-      <div>Exibindo 0 de 0 páginas</div>
-      <div className="mt-6 flex justify-between items-center">
-        <div className="flex space-x-2">
-          <button className="px-4" variant="ghost">
-            {`<`}
-          </button>
-          <button className="px-4" variant="ghost">
-            {`>`}
-          </button>
-        </div>
-        <div className="flex items-center space-x-2">
-          <FaRegCircle className="text-blue-500" />
-          <Link className="text-blue-500 underline" href="#">
-            Aprenda mais sobre os produtos
-          </Link>
-        </div>
-      </div>
+      <FotterTable />
+      <Guide topic={'os produtos'} />
     </div>
 
   )

@@ -19,7 +19,7 @@ export default function NavBar () {
        
         <span>Marketplace</span>
       </Link>
-      <Link className="flex items-center space-x-3 p-2 rounded-md hover:bg-[#4A5568]" to={'/'}>
+      <Link className="flex items-center space-x-3 p-2 rounded-md hover:bg-[#4A5568]" to={'/meusafiliados'}>
         
         <span>Meus Afiliados</span>
       </Link>

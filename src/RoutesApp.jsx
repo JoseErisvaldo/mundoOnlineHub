@@ -5,6 +5,7 @@ import NavBar from "./Components/NavBar";
 import Products from "./Pages/Products";
 import Members from "./Pages/Members";
 import Marketplace from "./Pages/Marketplace";
+import MyAffiliates from "./Pages/MyAffiliates";
 
 
 
@@ -20,6 +21,7 @@ export default function RoutesApp () {
           <Route path="/produtos" element={<Products/>} />
           <Route path="/membros" element={<Members/>} />
           <Route path="/marketplace" element={<Marketplace/>} />
+          <Route path="/meusafiliados" element={<MyAffiliates/>} />
         </Routes>
       </div>
     </BrowserRouter>

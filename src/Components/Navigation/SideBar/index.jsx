@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Link } from "react-router-dom";
 import { IoIosMenu } from "react-icons/io";
+import { useContext } from 'react';
+import { AuthContext } from '../../Context';
 
 export default function SideBar () {
   const [menuAberto, setMenuAberto] = useState(false);
@@ -8,6 +10,8 @@ export default function SideBar () {
   const toggleMenu = () => {
     setMenuAberto(!menuAberto);
   };
+
+  const {logout} = useContext(AuthContext)
 
   return (
     <div>
@@ -56,6 +60,9 @@ export default function SideBar () {
         <Link onClick={toggleMenu} className="flex items-center space-x-3 p-2 rounded-md hover:bg-[#4A5568]" to={'/'}>
           <span>Ajuda</span>
         </Link>
+        <button onClick={logout} className=" w-full flex items-center space-x-3 p-2 rounded-md hover:bg-[#4A5568]" to={'/'}>
+          Sair
+        </button>
       </div>
     </div>
   );

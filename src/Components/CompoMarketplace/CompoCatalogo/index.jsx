@@ -1,65 +1,57 @@
+import { useEffect, useState } from "react";
+import supabase from "../../../SupabaseClient";
+import ModalCatalogo from "../ModalCatalogo";
 
 export default function CompoCatalogo () {
-  const cursosTecnologia = [
-    {
-        title: 'Curso de JavaScript Avançado',
-        price: 89.99,
-        vendedor: 'CodeMaster Academy'
-    },
-    {
-        title: 'Curso de Python para Iniciantes',
-        price: 79.99,
-        vendedor: 'Pythonic University'
-    },
-    {
-        title: 'Curso Completo de Java',
-        price: 99.99,
-        vendedor: 'Java Pro'
-    },
-    {
-        title: 'Curso de C++ Essencial',
-        price: 109.99,
-        vendedor: 'C++ Experts'
-    },
-    {
-        title: 'Curso de Ruby on Rails',
-        price: 69.99,
-        vendedor: 'Ruby Inc.'
-    },
-    {
-        title: 'Curso de Swift para Desenvolvimento iOS',
-        price: 119.99,
-        vendedor: 'iOS Academy'
-    },
-    {
-        title: 'Curso de PHP Avançado',
-        price: 84.99,
-        vendedor: 'PHP Masters'
-    },
-    {
-        title: 'Curso de C# e .NET Core',
-        price: 94.99,
-        vendedor: '.NET Gurus'
-    },
-    {
-        title: 'Curso de Kotlin para Android',
-        price: 109.99,
-        vendedor: 'Android Experts'
-    },
-    {
-        title: 'Curso de TypeScript e Angular',
-        price: 109.99,
-        vendedor: 'Angular School'
-    }
-];
+  const [catalog, setCatalog] = useState([])
+  const fecthProducts = () => {
+    return new Promise((resolve, reject) => {
+      supabase
+      .from('products')
+      .select('*')
+      .then(({data, error}) => {
+        if(error) {
+          reject(error)
+        } else {
+          resolve(data)
+        }
+      })
+    })
+  }
 
-console.log(cursosTecnologia);
+  const fecthUsers = () => { 
+    return new Promise((resolve, reject) => {
+      supabase
+      .from('users')
+      .select('*')
+      .then(({data, error}) => {
+        if(error) {
+          reject(error)
+        } else {
+          resolve(data)
+        }
+      })
+    })
+  }
+
+  useEffect(() => {
+    Promise.all([fecthProducts(),fecthUsers()])
+    .then(([productsData, usersData]) => {
+      let joinProducts = productsData.map((products) => {
+        let user = usersData.filter(user => user.user_id == products.user_id)
+        return {...products, user} 
+      })
+      setCatalog(joinProducts)
+
+    })
+  }, [])
+
 
 
   return(
     <div className="  grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4 md:p-6">
-      {cursosTecnologia.map((item) => (
-        <div className="grid gap-2 border-2 p-2" key={item.title}>
+      {catalog.map((item) => (
+        <div className="grid gap-2 border-2 p-2" key={item.id}>
         <img
           alt="Product 1"
           className="rounded-lg aspect-16/9 object-cover w-full bg-slate-900"
@@ -68,11 +60,12 @@ console.log(cursosTecnologia);
           width={400}
         />
         <div className="grid gap-1.5">
-          <h3 className="font-semibold text-lg md:text-xl">{item.title}</h3>
-          <div className="">Por<span className="font-semibold" > {item.vendedor}</span> </div>
+          <h3 className="font-semibold text-lg md:text-xl">{item.name}</h3>
+          <div className="">Por<span className="font-semibold" > {item.user[0].name}</span> </div>
           <h4 className="font-semibold text-base md:text-lg">R$ {item.price}</h4>
         </div>
-        <button className="bg-green-500 rounded h-10 text-white hover:bg-green-400">Adicionar ao carrinho</button>
+        
+        <button className="bg-green-500 rounded h-10 text-white hover:bg-green-400"><ModalCatalogo id={item.id} /></button>
       </div>
       ))}
       

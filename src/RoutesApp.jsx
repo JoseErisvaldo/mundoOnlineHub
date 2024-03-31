@@ -28,7 +28,7 @@ export default function RoutesApp () {
 
     
     if(!autenticado) {
-      return <Navigate to="/login" />
+      return <Navigate to="/login"  />
     }
     return children
   }
@@ -47,7 +47,6 @@ export default function RoutesApp () {
           <Routes>
 
             <Route path="/login" element={  <Login/>} />
-
             <Route path="/" element={ <AdminPrivate> <Home/> </AdminPrivate>} />
             <Route path="/produtos" element={<Products/>} />
             <Route path="/membros" element={<Members/>} />

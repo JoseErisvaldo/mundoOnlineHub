@@ -9,6 +9,8 @@ export const AuthProvider = ({children}) => {
   const navigate = useNavigate()
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [register, setRegister] = useState(null)
+
 
   useEffect(() => {
     const localStorange = localStorage.getItem('sb-ummrcakwdaeufujhnvrv-auth-token')
@@ -30,7 +32,7 @@ export const AuthProvider = ({children}) => {
     setUser(email,password)
     navigate('/')
   } else {
-    console.log('Erro ao logar !')
+    alert('Erro ao logar !')
   }
     console.log(data)
   }
@@ -41,8 +43,47 @@ export const AuthProvider = ({children}) => {
     navigate('/')
   }
 
+
+ async function signUpNewUser(email, password, name) {
+  try {
+    const { data, error } = await supabase.auth.signUp({
+      email: email,
+      password: password
+    });
+    
+    if (error) {
+      console.error("Erro ao criar conta:", error.message)
+      alert('Erro')
+      return
+    }
+
+    await userTable(data.user.id, email)
+    
+    setRegister(data)
+    } catch (error) {
+      console.error("Erro ao criar conta:", error.message)
+    }
+  }
+
+  async function userTable(userId, email, name) {
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .insert([{ user_id: userId, email: email, name: name }])
+      
+      if (error) {
+        console.error("Erro ao inserir usuário na tabela:", error.message)
+        return
+      }
+
+      alert("Conta criada") 
+    } catch (error) {
+      console.error("Erro ao inserir usuário na tabela:", error.message)
+    }
+  }
+
   return(
-    <AuthContext.Provider value={({autenticado: !!user, user, logout, login})} >
+    <AuthContext.Provider value={({autenticado: !!user, user, logout, login, signUpNewUser})} >
       {children}
     </AuthContext.Provider>
   )

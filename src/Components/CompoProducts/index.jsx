@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IoMdSearch } from "react-icons/io";
 import GenericForm from "../UIComponents/Form/GenericForm";
 import Table from "../UIComponents/Table/table";
@@ -8,38 +8,62 @@ import FotterTable from "../UIComponents/FotterTable";
 import Guide from "../UIComponents/Guide";
 import ModalProducts from "./ModalProducts";
 import supabase from "../../SupabaseClient";
-import { AuthContext } from "../Context";
 import { IoReload } from "react-icons/io5";
 
-
 export default function CompoProducts() {
-  const {user} = useContext(AuthContext)
-  const userId = user ? user.user.id : []
-  let [productsBd, setProductsBd] = useState([])
+  const [user, setUser] = useState(null);
+  const [productsBd, setProductsBd] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const localStorangeUser = localStorage.getItem('sb-ummrcakwdaeufujhnvrv-auth-token')
+    const localUser = localStorangeUser ? JSON.parse(localStorangeUser) : null
+    setUser(localUser)
+  }, []);
+
+  useEffect(() => {
+    if (user?.user) {
+      loadingProducts()
+    } else {
+      setLoading(true)
+    }
+  }, [user])
 
   async function loadingProducts() {
-    let { data, error } = await supabase
-    .from('products')
-    .select('*')
-    .eq('user_id', userId)
-    console.log(data)
-    if (error) {
+    setLoading(true)
+    try {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('user_id', user.user.id);
+      if (error) {
+        console.error('Erro ao carregar produtos:', error.message)
+      } else {
+        setProductsBd(data)
+      }
+    } catch (error) {
       console.error('Erro ao carregar produtos:', error.message)
-    } else {
-      setProductsBd(data);
+    } finally {
+      setLoading(false)
     }
   }
+
   useEffect(() => {
-    loadingProducts();
-  }, []);
-  
-  const dataToShow = productsBd.length > 0 ? productsBd.map(product => ({
+    if (user?.user) {
+      loadingProducts()
+    }
+  }, [user])
+
+  const dataToShow = productsBd.map(product => ({
     ID: product.id,
     Nome: product.name,
     Preço: `R$ ${product.price}`,
-    Status: product.status === true ? 'Ativo' : 'Inativo'
-  })) : []
+    Status: product.status ? 'Ativo' : 'Inativo'
+  }));
 
+  function updateProducts() {
+    loadingProducts();
+  }
 
   const typeProducts = [
     { value: "Todos", label: "Todos" },
@@ -63,9 +87,6 @@ export default function CompoProducts() {
     }
   ];
 
-  function updateProducts () {
-    loadingProducts()
-  }
   return (
     <div className="bg-white p-8 w-full">
       <div className="mb-2 flex justify-between">
@@ -82,16 +103,21 @@ export default function CompoProducts() {
 
       <div className="mb-6 flex items-center space-x-4">
         <div className="flex items-center space-x-2 border p-2">
-          <GenericForm fields={inputProducts}  />
+          <GenericForm fields={inputProducts} />
           <IoMdSearch className="text-gray-500 cursor-pointer" />
         </div>
-
         <GenericForm fields={field} submit={false} />
       </div>
-      <div>
-        <div onClick={updateProducts} className="cursor-pointer text-2xl"><IoReload /></div>
-        <Table data={dataToShow} />
-      </div>
+
+      {loading ? (
+        <div>Carregando...</div>
+      ) : (
+        <div>
+          <div onClick={updateProducts} className="cursor-pointer text-2xl"><IoReload /></div>
+          <Table data={dataToShow} />
+        </div>
+      )}
+      
       <FotterTable />
       <Guide topic="os produtos" />
     </div>

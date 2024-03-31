@@ -57,10 +57,14 @@ export default function ModalProducts() {
     ])
     .select()
             
-    console.log(data)
-    console.log(e)
-     navigate('/produtos')
-    closeModal();
+    if (data === null) {
+      alert('Error ao criar produto !!')
+    } else {
+      console.log(e)
+      navigate('/produtos')
+      closeModal();
+    }
+    
   };
 
   

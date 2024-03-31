@@ -2,6 +2,10 @@ import React from 'react';
 
 // Definição do componente Table
 function Table({ data }) {
+
+  if (!data || data.length === 0) {
+    return <p>Nenhum dado disponível</p>;
+  }
   return (
     <table className='w-full '>
       <thead>

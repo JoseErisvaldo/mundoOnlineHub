@@ -1,4 +1,6 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthContext, AuthProvider } from "./Components/Context";
+import { useContext } from "react";
 
 import Header from "./Components/Header";
 import SideBar from "./Components/Navigation/SideBar";
@@ -14,29 +16,53 @@ import Financial from "./Pages/Financial";
 import Report from "./Pages/Report";
 import Collaborators from "./Pages/Collaborators";
 import Dashboard from "./Pages/Dashboard";
+import Login from "./Pages/Login";
+
 
 
 export default function RoutesApp () {
+
+  const AdminPrivate = ({children}) => {
+    
+    const {autenticado} = useContext(AuthContext)
+
+    
+    if(!autenticado) {
+      return <Navigate to="/login" />
+    }
+    return children
+  }
+
   return(
     <BrowserRouter>
+    <AuthProvider>
+        <AdminPrivate>
+          <Header/>
+        </AdminPrivate>
+      
+        <div className="flex">
+          <AdminPrivate>
+          <SideBar/>
+          </AdminPrivate>
+          <Routes>
 
-      <Header/>
-      <div className="flex">
-        <SideBar/>
-        <Routes>
-          <Route path="/" element={<Home/>} />
-          <Route path="/produtos" element={<Products/>} />
-          <Route path="/membros" element={<Members/>} />
-          <Route path="/marketplace" element={<Marketplace/>} />
-          <Route path="/meusafiliados" element={<MyAffiliates/>} />
-          <Route path="/vendas" element={<Orders/>} />
-          <Route path="/assinaturas" element={<Subscriptions/>} />
-          <Route path="/financeiro" element={<Financial/>} />
-          <Route path="/relatorios" element={<Report/>} />
-          <Route path="/colaboradores" element={<Collaborators/>} />
-          <Route path="/dashboard" element={<Dashboard />} />
-        </Routes>
-      </div>
+            <Route path="/login" element={  <Login/>} />
+
+            <Route path="/" element={ <AdminPrivate> <Home/> </AdminPrivate>} />
+            <Route path="/produtos" element={<Products/>} />
+            <Route path="/membros" element={<Members/>} />
+            <Route path="/marketplace" element={<Marketplace/>} />
+            <Route path="/meusafiliados" element={<MyAffiliates/>} />
+            <Route path="/vendas" element={<Orders/>} />
+            <Route path="/assinaturas" element={<Subscriptions/>} />
+            <Route path="/financeiro" element={<Financial/>} />
+            <Route path="/relatorios" element={<Report/>} />
+            <Route path="/colaboradores" element={<Collaborators/>} />
+            <Route path="/dashboard" element={<Dashboard />} />
+          </Routes>
+        </div>
+      </AuthProvider>
+
     </BrowserRouter>
   )
 }

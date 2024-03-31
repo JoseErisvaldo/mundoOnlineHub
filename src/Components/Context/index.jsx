@@ -57,7 +57,7 @@ export const AuthProvider = ({children}) => {
       return
     }
 
-    await userTable(data.user.id, email)
+    await userTable(data.user.id, email, name)
     
     setRegister(data)
     } catch (error) {

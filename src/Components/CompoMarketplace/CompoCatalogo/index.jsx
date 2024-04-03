@@ -19,7 +19,7 @@ export default function CompoCatalogo () {
     })
   }
 
-  const fecthUsers = () => { 
+  const fecthUsers = () => {
     return new Promise((resolve, reject) => {
       supabase
       .from('users')
@@ -34,7 +34,7 @@ export default function CompoCatalogo () {
     })
   }
 
-  useEffect(() => {
+   useEffect(() => {
     Promise.all([fecthProducts(),fecthUsers()])
     .then(([productsData, usersData]) => {
       let joinProducts = productsData.map((products) => {
@@ -68,11 +68,11 @@ export default function CompoCatalogo () {
         <button className="bg-green-500 rounded h-10 text-white hover:bg-green-400"><ModalCatalogo id={item.id} /></button>
       </div>
       ))}
-      
+   
+   
 
-      
 
-
+   
     </div>
 
 

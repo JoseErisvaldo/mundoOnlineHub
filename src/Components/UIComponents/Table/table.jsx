@@ -1,13 +1,14 @@
 import React from 'react';
 
 // Definição do componente Table
-function Table({ data }) {
+function Table({ data, onCellClick }) {
 
   if (!data || data.length === 0) {
     return <p>Nenhum dado disponível</p>;
   }
+
   return (
-    <table className='w-full '>
+    <table className='w-full'>
       <thead>
         <tr className='border-b-2'>
           {/* Cria os cabeçalhos da tabela baseados nas chaves do primeiro objeto */}
@@ -21,8 +22,10 @@ function Table({ data }) {
         {data.map((row, index) => (
           <tr key={index} className=''>
             {/* Mapeia cada valor do objeto para criar as células */}
-            {Object.values(row).map((value, index) => (
-              <td key={index} className='text-center cursor-pointer p-3'>{value}</td>
+            {Object.entries(row).map(([key, value], index) => (
+              <td key={index} className='text-center p-3' onClick={() => onCellClick(row, key)}>
+                {value}
+              </td>
             ))}
           </tr>
         ))}

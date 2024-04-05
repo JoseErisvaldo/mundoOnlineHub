@@ -24,7 +24,9 @@ export default function ModalCatalogo({id}) {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [display, setDisplay] = useState([]);
   const [alerta, setAlerta] = useState(false);
-
+  let resId = display.map((item) => {
+    return item.user.user_id
+  })
   const openModal = () => setModalIsOpen(true);
   const closeModal = () => setModalIsOpen(false);
 
@@ -75,6 +77,7 @@ export default function ModalCatalogo({id}) {
       await supabase
         .from('affiliate')
         .insert([{ 
+          user_id_products: resId[0],
           idproduct: id,
           request: true,
           affiliate: false
@@ -88,7 +91,6 @@ export default function ModalCatalogo({id}) {
       console.error('Error handling affiliate:', error);
     }
   }
-
   return (
     <div>
       <button onClick={openModal}>Detalhes</button>

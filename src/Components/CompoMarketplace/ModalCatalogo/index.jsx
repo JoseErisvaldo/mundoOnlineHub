@@ -29,6 +29,7 @@ export default function ModalCatalogo({ id, user_id }) {
   const [contenList, setContenList] = useState(false);
   const [userSolicitation, setUserSolicitation] = useState();
   const [myAnnounce, setMyAnnounce] = useState(false);
+  const [idRequestFavorite, setIdRequestFavorite] = useState([]);
 
   let resId = display.map((item) => {
     return item.user.user_id;
@@ -164,7 +165,7 @@ export default function ModalCatalogo({ id, user_id }) {
   async function viewFavorite() {
     const { data, error } = await supabase.from("productsfavorite").select("*");
     console.log("Favorito", data);
-    setIdRequestFavorite(data)
+    setIdRequestFavorite(data);
   }
 
   useEffect(() => {
@@ -172,8 +173,19 @@ export default function ModalCatalogo({ id, user_id }) {
   }, []);
 
   async function handleFavorite() {
-
-
+    if (idRequestFavorite) {
+      let map = idRequestFavorite.map((favorite) => {
+        if (
+          favorite.idproduct === id &&
+          favorite.user_id_addfavorite === userSolicitation
+        ) {
+          console.log("Sim");
+          return;
+        } else {
+          console.log("Não");
+        }
+      });
+    }
     const { data, error } = await supabase.from("productsfavorite").insert([
       {
         user_id_products: resId[0],

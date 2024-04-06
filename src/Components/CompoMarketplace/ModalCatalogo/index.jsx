@@ -3,6 +3,7 @@ import Modal from "react-modal";
 import { IoMdClose } from "react-icons/io";
 import supabase from "../../../SupabaseClient";
 import Alert from "../../UIComponents/Alert";
+import { MdOutlineFavorite } from "react-icons/md";
 
 const customStyles = {
   content: {
@@ -85,8 +86,6 @@ export default function ModalCatalogo({ id, user_id }) {
             );
             return { ...product, user };
           });
-          console.log("display", display);
-          console.log("userSolicitation", userSolicitation);
           let myProducts = productsUser.map((product) => {
             if (product.user_id == userSolicitation) {
               setMyAnnounce(true);
@@ -101,7 +100,11 @@ export default function ModalCatalogo({ id, user_id }) {
 
   async function affiliate() {
     try {
-      const { data, error } = await supabase.from("affiliate").select("*");
+      const { data, error } = await supabase
+        .from("affiliate")
+        .select("*")
+        .eq("canceled", false)
+        .eq("request", true);
       setIdAffiliate(data);
       if (error) throw error;
     } catch (error) {
@@ -117,6 +120,7 @@ export default function ModalCatalogo({ id, user_id }) {
           idproduct: id,
           request: true,
           affiliate: false,
+          canceled: false,
         },
       ]);
       setAlerta(true);
@@ -139,7 +143,12 @@ export default function ModalCatalogo({ id, user_id }) {
     try {
       const { error } = await supabase
         .from("affiliate")
-        .update({ canceled: true, affiliate: false, request: false })
+        .update({
+          canceled: true,
+          affiliate: false,
+          request: false,
+          datecanceled: new Date(),
+        })
         .eq("user_id_request", userSolicitation)
         .select();
       setAlerta(true);
@@ -152,6 +161,27 @@ export default function ModalCatalogo({ id, user_id }) {
     }
   }
 
+  async function viewFavorite() {
+    const { data, error } = await supabase.from("productsfavorite").select("*");
+    console.log("Favorito", data);
+    setIdRequestFavorite(data)
+  }
+
+  useEffect(() => {
+    viewFavorite();
+  }, []);
+
+  async function handleFavorite() {
+
+
+    const { data, error } = await supabase.from("productsfavorite").insert([
+      {
+        user_id_products: resId[0],
+        idproduct: id,
+        favorite: true,
+      },
+    ]);
+  }
   return (
     <div>
       <button onClick={openModal}>Detalhes</button>
@@ -176,9 +206,17 @@ export default function ModalCatalogo({ id, user_id }) {
           {display.map((item) => (
             <div key={item.id} className="flex gap-5">
               <div className="flex flex-col">
-                <div>
-                  <strong>Data do Produto:</strong>{" "}
-                  {new Date(item.created_at).toLocaleDateString()}
+                <div className="flex justify-between">
+                  <div>
+                    <strong>Data do Produto:</strong>{" "}
+                    {new Date(item.created_at).toLocaleDateString()}
+                  </div>
+                  <div
+                    onClick={handleFavorite}
+                    className="text-3xl cursor-pointer"
+                  >
+                    <MdOutlineFavorite />
+                  </div>
                 </div>
                 <div>
                   <strong>Título:</strong> {item.name}

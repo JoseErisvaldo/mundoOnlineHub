@@ -15,7 +15,8 @@ export default function CompoMembers () {
   ]
 
   const data = [
-    { NOME: 'José Erisvaldo', PROGRESSO: '0%', PERFIL: 'Detalhes'}
+    { NOME: 'José Erisvaldo', PROGRESSO: '0%', PERFIL: 'Detalhes'},
+    { NOME: 'Lucia', PROGRESSO: '0%', PERFIL: 'Detalhes'}
   ]
   
 

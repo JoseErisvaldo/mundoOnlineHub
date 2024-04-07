@@ -1,6 +1,8 @@
-export default function Alert({ alert }) {
+import React from "react";
+
+export default function Alert({ alert, color }) {
   return (
-    <div className="z-50 fixed top-20 right-0 bg-blue-600 hover:bg-blue-500 font-bold p-2 m-3 rounded text-white">
+    <div className={`z-50 fixed top-20 right-0 bg-${color}-600 hover:bg-${color}-500 font-bold p-2 m-3 rounded text-white`}>
       {alert}
     </div>
   );

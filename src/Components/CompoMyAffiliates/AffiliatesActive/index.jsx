@@ -1,15 +1,14 @@
 import { useContext, useEffect, useState } from "react";
-import supabase from "../../SupabaseClient";
-import NavBar from "../Navigation/NavBar";
-import GenericForm from "../UIComponents/Form/GenericForm";
-import Table from "../UIComponents/Table/table";
-import Title from "../UIComponents/Title/Title";
+import supabase from "../../../SupabaseClient";
+import GenericForm from "../../UIComponents/Form/GenericForm";
+import Table from "../../UIComponents/Table/table";
+import Title from "../../UIComponents/Title/Title";
 import { IoSearchOutline } from "react-icons/io5";
-import ModalAffiliates from "./ModalAffiliates";
+import ModalAffiliates from "../ModalAffiliates";
 import { IoReloadOutline } from "react-icons/io5";
-import NavBarAffiliates from "./NavBarAffiliates";
+import NavBarAffiliates from "../NavBarAffiliates";
 
-export default function CompoMyAffiliates() {
+export default function AffiliatesActive() {
   const [affiliates, setAffiliates] = useState([]);
   const [id, setId] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -34,8 +33,8 @@ export default function CompoMyAffiliates() {
         .from("affiliate")
         .select("*")
         .eq("user_id_products", id)
-        .eq("request", true)
-        .eq("affiliate", false)
+        .eq("request", false)
+        .eq("affiliate", true)
         .then((data, error) => {
           if (error) {
             reject(error);
@@ -108,7 +107,6 @@ export default function CompoMyAffiliates() {
             ? affiliate.products.map((product) => product.name)
             : [],
           Solicitante: affiliate.userRequest[0].name,
-          Detalhes: "Detalhes",
         }))
       : [];
 

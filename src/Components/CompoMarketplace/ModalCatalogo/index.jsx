@@ -1,96 +1,238 @@
-import React, { useEffect, useState } from 'react';
-import Modal from 'react-modal';
+import React, { useEffect, useState } from "react";
+import Modal from "react-modal";
 import { IoMdClose } from "react-icons/io";
-import supabase from '../../../SupabaseClient';
-import Alert from '../../UIComponents/Alert';
+import supabase from "../../../SupabaseClient";
+import Alert from "../../UIComponents/Alert";
+import { MdOutlineFavoriteBorder } from "react-icons/md";
+import { MdOutlineFavorite } from "react-icons/md";
 
 const customStyles = {
   content: {
-    top: '50%',
-    left: '50%',
-    right: 'auto',
-    bottom: 'auto',
-    marginRight: '-50%',
-    transform: 'translate(-50%, -50%)',
-    borderRadius: '10px',
-    maxWidth: '900px', 
-    padding: '20px'
+    top: "50%",
+    left: "50%",
+    right: "auto",
+    bottom: "auto",
+    marginRight: "-50%",
+    transform: "translate(-50%, -50%)",
+    borderRadius: "10px",
+    maxWidth: "900px",
+    padding: "20px",
   },
 };
 
-Modal.setAppElement('#root')
+Modal.setAppElement("#root");
 
-export default function ModalCatalogo({id}) {
+export default function ModalCatalogo({ id, user_id }) {
+  const [isDisabled, setIsDisabled] = useState(false);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [display, setDisplay] = useState([]);
-  const [alerta, setAlerta] = useState(false);
-  let resId = display.map((item) => {
-    return item.user.user_id
-  })
+  const [alert, setAlert] = useState(false);
+  const [idAffiliate, setIdAffiliate] = useState([]);
+  const [contenList, setContenList] = useState(false);
+  const [userSolicitation, setUserSolicitation] = useState();
+  const [myAnnounce, setMyAnnounce] = useState(false);
+  const [idRequestFavorite, setIdRequestFavorite] = useState([]);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [listRemoveFavorite, setListRemoveFavorite] = useState([]);
+
   const openModal = () => setModalIsOpen(true);
   const closeModal = () => setModalIsOpen(false);
 
-  const fecthProduts = () => {
-    return supabase
-      .from('products')
-      .select('*')
-      .eq('id', id)
-      .eq('status', true)
-      .then(({data, error}) => {
-        if(error) {
-          throw error;
-        } else {
-          return data;
-        }
-      });
-  }
+  const fetchProducts = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("products")
+        .select("*")
+        .eq("id", id)
+        .eq("status", true);
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      throw error;
+    }
+  };
 
-  const fechtUser = () => {
-    return supabase
-      .from('users')
-      .select('*')
-      .then(({data, error}) => {
-        if(error) {
-          throw error;
-        } else {
-          return data;
-        }
-      });
-  }
+  const fetchUser = async () => {
+    try {
+      const { data, error } = await supabase.from("users").select("*");
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      throw error;
+    }
+  };
+
+  const fetchAffiliate = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("affiliate")
+        .select("*")
+        .eq("canceled", false)
+        .eq("request", true);
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error("Error fetching affiliate:", error);
+      throw error;
+    }
+  };
 
   useEffect(() => {
-    if(modalIsOpen) {
-      Promise.all([fecthProduts(), fechtUser()])
-        .then(([productsData, userData]) => {
-          const productsUser = productsData.map((product) => {
-            const user = userData.find(user => user.user_id === product.user_id);
-            return {...product, user};
-          });
-          setDisplay(productsUser);
-        })
-        .catch(error => console.error('Error fetching data:', error));
-    }
-  }, [modalIsOpen, id]);
+    viewFavorite()
+    const fetchData = async () => {
+      try {
+        const [productsData, userData, affiliateData] = await Promise.all([
+          fetchProducts(),
+          fetchUser(),
+          fetchAffiliate(),
+        ]);
 
-  async function handleAffiliate() {
+        const productsUser = productsData.map((product) => {
+          const user = userData.find((user) => user.user_id === product.user_id);
+          return { ...product, user };
+        });
+
+        let myProducts = productsUser.some((product) => product.user_id === userSolicitation);
+
+        setMyAnnounce(myProducts);
+        setDisplay(productsUser);
+
+        affiliateData.forEach((item) => {
+          if (item.user_id_request === userSolicitation && item.idproduct === id) {
+            setContenList(true);
+          }
+        });
+        idRequestFavorite.forEach((item) => {
+          if(item.user_id_addfavorite === userSolicitation && item.idproduct === id) {
+            setListRemoveFavorite(item)
+            setIsFavorite(true)
+          }
+        })
+
+
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    if (modalIsOpen) {
+      fetchData();
+    }
+  }, [modalIsOpen, id, userSolicitation, isFavorite]);
+
+  useEffect(() => {
+    const localStorageData = localStorage.getItem("sb-ummrcakwdaeufujhnvrv-auth-token");
+    const userData = JSON.parse(localStorageData);
+    setUserSolicitation(userData?.user.id);
+  }, []);
+
+  const handleFavorite = async () => {
+    setIsDisabled(true)
+    console.log(isDisabled)
     try {
-      await supabase
-        .from('affiliate')
-        .insert([{ 
-          user_id_products: resId[0],
+      await supabase.from("productsfavorite").insert([
+        {
+          user_id_products: display[0]?.user_id,
+          idproduct: id,
+          favorite: !isFavorite,
+        },
+      ]);
+      setAlert({message: "Solicitação Enviada", color: "blue"})
+      setTimeout(() => {
+        setAlert({message: "", color: ""})
+        setModalIsOpen(false)
+        setIsDisabled(false)
+        console.log(isDisabled)
+      }, 2000);
+      
+    } catch (error) {
+      console.error("Error handling favorite:", error);
+    }
+  };
+
+  const handleRemoveFavorite = async () => {
+    setIsDisabled(true)
+    console.log(isDisabled)
+    try {
+      const { error } = await supabase
+      .from('productsfavorite')
+      .delete()
+      .eq('id', listRemoveFavorite.id)
+
+      setAlert({message: "Solicitação Enviada", color: "blue"})
+      setTimeout(() => {
+        setAlert({message: "", color: ""})
+        setModalIsOpen(false)
+        setIsDisabled(false)
+        console.log(isDisabled)
+      }, 2000);
+      
+    } catch (error) {
+      console.error("Error handling favorite:", error);
+    }
+  };
+
+  const handleAffiliate = async () => {
+    setIsDisabled(true)
+    console.log(isDisabled)
+    try {
+      await supabase.from("affiliate").insert([
+        {
+          user_id_products: display[0]?.user_id,
           idproduct: id,
           request: true,
-          affiliate: false
-        }]);
-      setAlerta(true);
+          affiliate: false,
+          canceled: false,
+        },
+      ]);
+      setAlert({message: "Solicitação Enviada", color: "blue"})
       setTimeout(() => {
-        setAlerta(false);
-        setModalIsOpen(false);
+        setAlert({message: "", color: ""})
+        setModalIsOpen(false)
+        setIsDisabled(false)
+        console.log(isDisabled)
       }, 2000);
+
     } catch (error) {
-      console.error('Error handling affiliate:', error);
+      console.error("Error handling affiliate:", error);
     }
-  }
+  };
+
+  const handleCanceledAffiliate = async () => {
+    try {
+      await supabase
+        .from("affiliate")
+        .update({
+          canceled: true,
+          affiliate: false,
+          request: false,
+          datecanceled: new Date(),
+        })
+        .eq("user_id_request", userSolicitation)
+        .select();
+        setAlert({ message: "Cancelamento Enviada !", color: "red" });
+        setTimeout(() => {
+          setAlert({ message: "", color: "" });
+          setModalIsOpen(false);
+        }, 2000);
+
+    } catch (error) {
+      console.error("Error handling canceled affiliate:", error);
+    }
+  };
+
+  const viewFavorite = async () => {
+    try {
+      const { data, error } = await supabase.from("productsfavorite").select("*");
+      if (error) throw error;
+      setIdRequestFavorite(data);
+    } catch (error) {
+      console.error("Error viewing favorite:", error);
+    }
+  };
+
   return (
     <div>
       <button onClick={openModal}>Detalhes</button>
@@ -100,32 +242,92 @@ export default function ModalCatalogo({id}) {
         style={customStyles}
         contentLabel=""
       >
-        <div className='h-full flex flex-col gap-7'>
-          {alerta && <Alert alert={'Solicitação Enviada'} />}
-          
-          <div className='flex justify-between'>
-            <h2><strong>Dados do Produto</strong></h2>
-            <button onClick={closeModal}><IoMdClose size={24} /></button>
+        <div className="h-full flex flex-col gap-7">
+          {alert && <Alert alert={alert.message} color={alert.color} />}
+
+          <div className="flex justify-between">
+            <h2>
+              <strong>Dados do Produto</strong>
+            </h2>
+            <button onClick={closeModal}>
+              <IoMdClose size={24} />
+            </button>
           </div>
-          
+
           {display.map((item) => (
-            <div key={item.id} className='flex gap-5'>
-              <div className='flex flex-col'>
-                <div><strong>Data do Produto:</strong> {new Date(item.created_at).toLocaleDateString()}</div>
-                <div><strong>Título:</strong> {item.name}</div>
-                <div><strong>Por:</strong> {item.user && item.user[0]?.name}</div>
-                <div><strong>Tipo:</strong> {item.typeofpayment}</div>
-                <div className='h-72 overflow-y-auto m-3'><strong>Descrição:</strong> {item.description}</div>
-                <div className='flex gap-3'>
-                  <button className='bg-green-600 hover:bg-green-500 p-3 text-white rounded'>Comprar</button>
-                  <button onClick={handleAffiliate} className='bg-blue-600 hover:bg-blue-500 p-3 text-white rounded'>Solicitar Afiliação</button>
+            <div key={item.id} className="flex gap-5">
+              <div className="flex flex-col">
+                <div className="flex justify-between">
+                  <div>
+                    <strong>Data do Produto:</strong>{" "}
+                    {new Date(item.created_at).toLocaleDateString()}
+                  </div>
+                  {!myAnnounce && (
+                    !isFavorite ? (
+                      <button
+                        onClick={handleFavorite}
+                        className="text-3xl cursor-pointer"
+                        disabled={isDisabled}
+                      >
+                        <MdOutlineFavoriteBorder />
+                      </button>
+                    ) : (
+                      <button
+                        onClick={handleRemoveFavorite}
+                        className="text-3xl cursor-pointer"
+                        disabled={isDisabled}
+                      >
+                        <MdOutlineFavorite />
+                      </button>
+                    )
+                  )}
+                  
                 </div>
+                <div>
+                  <strong>Título:</strong> {item.name}
+                </div>
+                <div>
+                  <strong>Por:</strong> {item.user && item.user[0]?.name}
+                </div>
+                <div>
+                  <strong>Tipo:</strong> {item.typeofpayment}
+                </div>
+                <div className="h-72 overflow-y-auto m-3">
+                  <strong>Descrição:</strong> {item.description}
+                </div>
+
+                {!contenList && !myAnnounce && (
+                  <div className="flex gap-3">
+                    <button className="bg-green-600 hover:bg-green-500 p-3 text-white rounded" disabled={isDisabled}>
+                      Comprar
+                    </button>
+                    <button
+                      onClick={handleAffiliate}
+                      className="bg-blue-600 hover:bg-blue-500 p-3 text-white rounded"
+                      disabled={isDisabled} 
+                    >
+                      Solicitar Afiliação
+                    </button>
+                  </div>
+                )}
+
+                {contenList && (
+                  <div className="flex gap-3">
+                    <button
+                      onClick={handleCanceledAffiliate}
+                      className="bg-red-600 hover:bg-red-500 p-3 text-white rounded"
+                      disabled={isDisabled}
+                    >
+                      Cancelar
+                    </button>
+                  </div>
+                )}
+                {myAnnounce && (
+                  <div className="bg-yellow-500 border-2 hover:bg-yellow-500 p-3 text-white rounded cursor-pointer">
+                    Meu Anuncio
+                  </div>
+                )}
               </div>
-              {/*
-              <div className='border-2'>
-                <img src='dasd' alt={item.name} className='h-72 w-full object-cover' />
-              </div>
-              */}
             </div>
           ))}
         </div>

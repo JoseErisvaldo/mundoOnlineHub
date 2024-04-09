@@ -5,6 +5,7 @@ import supabase from "../../../SupabaseClient";
 import Alert from "../../UIComponents/Alert";
 import { MdOutlineFavoriteBorder } from "react-icons/md";
 import { MdOutlineFavorite } from "react-icons/md";
+import { Link } from "react-router-dom";
 
 const customStyles = {
   content: {
@@ -98,7 +99,7 @@ export default function ModalCatalogo({ id, user_id }) {
 
         setMyAnnounce(myProducts);
         setDisplay(productsUser);
-
+        console.log(productsUser)
         affiliateData.forEach((item) => {
           if (item.user_id_request === userSolicitation && item.idproduct === id) {
             setContenList(true);
@@ -130,7 +131,6 @@ export default function ModalCatalogo({ id, user_id }) {
 
   const handleFavorite = async () => {
     setIsDisabled(true)
-    console.log(isDisabled)
     try {
       await supabase.from("productsfavorite").insert([
         {
@@ -139,12 +139,11 @@ export default function ModalCatalogo({ id, user_id }) {
           favorite: !isFavorite,
         },
       ]);
-      setAlert({message: "Solicitação Enviada", color: "blue"})
+      setAlert({message: "Adicionado ao Favorito", color: "green"})
       setTimeout(() => {
         setAlert({message: "", color: ""})
         setModalIsOpen(false)
         setIsDisabled(false)
-        console.log(isDisabled)
       }, 2000);
       
     } catch (error) {
@@ -154,19 +153,17 @@ export default function ModalCatalogo({ id, user_id }) {
 
   const handleRemoveFavorite = async () => {
     setIsDisabled(true)
-    console.log(isDisabled)
     try {
       const { error } = await supabase
       .from('productsfavorite')
       .delete()
       .eq('id', listRemoveFavorite.id)
 
-      setAlert({message: "Solicitação Enviada", color: "blue"})
+      setAlert({message: "Removido do Favorito !", color: "red"})
       setTimeout(() => {
         setAlert({message: "", color: ""})
         setModalIsOpen(false)
         setIsDisabled(false)
-        console.log(isDisabled)
       }, 2000);
       
     } catch (error) {
@@ -298,9 +295,11 @@ export default function ModalCatalogo({ id, user_id }) {
 
                 {!contenList && !myAnnounce && (
                   <div className="flex gap-3">
+                    <Link to={`/carrinho/${item.id}`}>
                     <button className="bg-green-600 hover:bg-green-500 p-3 text-white rounded" disabled={isDisabled}>
                       Comprar
                     </button>
+                    </Link>
                     <button
                       onClick={handleAffiliate}
                       className="bg-blue-600 hover:bg-blue-500 p-3 text-white rounded"

@@ -3,7 +3,7 @@ import { IoMdSearch } from "react-icons/io";
 import GenericForm from "../UIComponents/Form/GenericForm";
 import Table from "../UIComponents/Table/table";
 import Title from "../UIComponents/Title/Title";
-import NavBar from "../Navigation/NavBar";
+import NavBarProducts from "./NavBarProducts"
 import FotterTable from "../UIComponents/FotterTable";
 import Guide from "../UIComponents/Guide";
 import ModalProducts from "./ModalProducts";
@@ -95,12 +95,8 @@ export default function CompoProducts() {
           <ModalProducts />
         </button>
       </div>
-      <div className="flex gap-3 mb-6">
-        <NavBar titleNavBar="Meus produtos" />
-        <NavBar titleNavBar="Minhas co-produções" />
-        <NavBar titleNavBar="Minhas afiliações" />
-      </div>
-
+     <NavBarProducts />
+    
       <div className="mb-6 flex items-center space-x-4">
         <div className="flex items-center space-x-2 border p-2">
           <GenericForm fields={inputProducts} />

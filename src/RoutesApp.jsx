@@ -9,7 +9,6 @@ import Home from "./Pages/Home";
 import Products from "./Pages/Products";
 import Members from "./Pages/Members";
 import Marketplace from "./Pages/Marketplace";
-import MyAffiliates from "./Pages/MyAffiliates";
 import Orders from "./Pages/Orders";
 import Subscriptions from "./Pages/Subscriptions";
 import Financial from "./Pages/Financial";
@@ -19,6 +18,10 @@ import Dashboard from "./Pages/Dashboard";
 import Login from "./Pages/Login";
 import AffiliatesActive from "./Components/CompoMyAffiliates/AffiliatesActive";
 import AffiliatesPending from "./Components/CompoMyAffiliates/AffiliatesPending";
+import Cart from "./Pages/Cart";
+import CatalogoProducts from "./Components/CompoProducts/CatalogoProducts";
+import MyCoproductions from "./Components/CompoProducts/MyCoproductions";
+import MyAffiliations from "./Components/CompoProducts/MyAffiliations";
 
 export default function RoutesApp() {
   const AdminPrivate = ({ children }) => {
@@ -52,7 +55,11 @@ export default function RoutesApp() {
                 </AdminPrivate>
               }
             />
-            <Route path="/produtos" element={<Products />} />
+
+            <Route path="/meusprodutos" element={<CatalogoProducts />} />
+            <Route path="/minhascoproducaoes" element={<MyCoproductions />} />
+            <Route path="/minhasafiliacoes" element={<MyAffiliations />} />
+
             <Route path="/membros" element={<Members />} />
             <Route path="/marketplace" element={<Marketplace />} />
             <Route
@@ -61,6 +68,9 @@ export default function RoutesApp() {
             />
             <Route path="/afiliadosativos" element={<AffiliatesActive />} />
             <Route path="/vendas" element={<Orders />} />
+
+            <Route path="/carrinho/:id" element={<Cart />} />
+
             <Route path="/assinaturas" element={<Subscriptions />} />
             <Route path="/financeiro" element={<Financial />} />
             <Route path="/relatorios" element={<Report />} />

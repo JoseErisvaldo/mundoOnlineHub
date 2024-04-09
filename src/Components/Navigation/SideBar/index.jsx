@@ -42,7 +42,7 @@ export default function SideBar() {
         <Link
           onClick={toggleMenu}
           className="flex items-center space-x-3 p-2 rounded-md hover:bg-[#4A5568]"
-          to={"/produtos"}
+          to={"/meusprodutos"}
         >
           <span>Produtos</span>
         </Link>

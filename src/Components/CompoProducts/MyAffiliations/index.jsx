@@ -9,11 +9,16 @@ import Guide from "../../UIComponents/Guide";
 import ModalProducts from "../ModalProducts";
 import supabase from "../../../SupabaseClient";
 import { IoReload } from "react-icons/io5";
+import ModalMyAffiliates from "../ModalMyAffiliates";
 
 export default function MyAffiliations() {
   const [user, setUser] = useState(null);
   const [affiliateBd, setAffiliateBd] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isModal, setIsModal] = useState(false)
+  const [closeModal, setCloseModal] = useState(false)
+  const [dadosModal, setDadosModal] = useState([])
+  const [update, setUpdate] = useState(false)
 
   useEffect(() => {
     const localStorangeUser = localStorage.getItem('sb-ummrcakwdaeufujhnvrv-auth-token')
@@ -31,6 +36,7 @@ export default function MyAffiliations() {
       .eq('user_id_request', user.user.id)
       .eq('request', false)
       .eq('affiliate', true)
+      .eq('canceled', false)
       .then(({data, error}) => {
         if(error) {
           reject('Error', error)
@@ -82,24 +88,27 @@ export default function MyAffiliations() {
           return {...affiliate, products,userProducts}
         })
         setAffiliateBd(joinData)
+        setUpdate(false);
         console.log(joinData)
       })
 
     } else {
       setLoading(false)
     }
-  }, [user])
-  const dataToShow = affiliateBd.map(product => ({
+  }, [user,update])
+  const dataToShow = affiliateBd ? affiliateBd.map(product => ({
     ID: product.id,
     Solicitado: new Date(product.created_at).toLocaleString(),
+    Por: product.userProducts[0].name,
     Titulo: product.products[0].name,
     Comissão: product.products[0].price,
-    Anuncio: product.status ? 'Ativo' : 'Inativo',
+    Anuncio: product.statusannouncement ? 'Ativo' : 'Inativo',
+    Cancelado: product.canceled ? 'Sim' : 'Não',
     Gerenciar: 'Detalhes'
-  }));
+  })) : []
 
   function updateProducts() {
-    
+    setUpdate(true)
   }
 
   const typeProducts = [
@@ -124,6 +133,17 @@ export default function MyAffiliations() {
     }
   ];
 
+  const handleIsModal =  (row, key) => {
+    if(key === 'Gerenciar') {
+      setIsModal(true)
+      setDadosModal(row)
+    }
+  }
+  
+  function handleCloseModal () {
+    setIsModal(false)
+  }
+
   return (
     <div className="bg-white p-8 w-full">
       <div className="mb-2 flex justify-between">
@@ -147,7 +167,8 @@ export default function MyAffiliations() {
       ) : (
         <div>
           <div onClick={updateProducts} className="cursor-pointer text-2xl"><IoReload /></div>
-          <Table data={dataToShow} />
+          <Table data={dataToShow} onCellClick={handleIsModal} />
+          <ModalMyAffiliates isModal={isModal} closeModal={handleCloseModal} dados={dadosModal} />
         </div>
       )}
 

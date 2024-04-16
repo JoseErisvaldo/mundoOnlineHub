@@ -71,7 +71,6 @@ export default function ModalCatalogo({ id, user_id }) {
         .from("affiliate")
         .select("*")
         .eq("canceled", false)
-        .eq("request", true);
       if (error) throw error;
       return data;
     } catch (error) {

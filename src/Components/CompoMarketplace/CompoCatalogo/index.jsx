@@ -44,6 +44,7 @@ export default function CompoCatalogo() {
           return { ...products, user };
         });
         setCatalog(joinProducts);
+        console.log(joinProducts)
       },
     );
   }, []);

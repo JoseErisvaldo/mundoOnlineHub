@@ -33,8 +33,11 @@ const initialFormValues = {
 
 export default function ModalMyAffiliates({isModal, closeModal, dados}) {
   const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [alertError, setError] = useState(false)
+
   const [alertAnnouncementInactive, setAlertAnnouncementInactive] = useState(false)
   const [alertAnnouncementActive, setAlertAnnouncementActive] = useState(false)
+  const [alertCanceledAnnouncement, setAlertCanceledAnnouncement] = useState(false)
 
   const openModal = () => setModalIsOpen(true);
 
@@ -64,13 +67,44 @@ export default function ModalMyAffiliates({isModal, closeModal, dados}) {
       setAlertAnnouncementActive(false)
     }, 2000);
   }
-  
+  console.log(dados)
+  async function handleCanceledAnnouncement () {
+    try {
+      const {data, error} = await supabase
+    .from('affiliate')
+    .update({canceled: true, datecanceled: new Date()})
+    .eq('id', dados.ID)
+    .select()
 
+    if(data) {
+      setAlertCanceledAnnouncement(true)
+      closeModal()
+      console.log(data)
+      setTimeout(() => {
+      setAlertCanceledAnnouncement(false)
+      }, 2000);
+    } else {
+      setError(true)
+      closeModal()
+      setTimeout(() => {
+        setError(false)
+      }, 2000)
+    }
+    
+    } catch (error) {
+      console.log(error)
+    }
+    
+  }
 
   return (
     <div>
+      {alertError && (<Alert alert={'Error na Solicitação !'} color={'red'} />)}
+
+
       {alertAnnouncementInactive && (<Alert alert={'Anuncio Inativado !'} color={'red'} />)}
       {alertAnnouncementActive && (<Alert alert={'Anuncio Ativado !'} color={'green'} />)}
+      {alertCanceledAnnouncement && (<Alert alert={'Afiliação Cancelada !'} color={'green'} />)}
 
       <Modal
         isOpen={isModal}
@@ -92,7 +126,7 @@ export default function ModalMyAffiliates({isModal, closeModal, dados}) {
               <strong>Cancelado: </strong> 
               {dados.Cancelado} 
               {dados.Cancelado === 'Não' ? 
-                <div className=' bg-yellow-600 p-1 rounded text-white cursor-pointer '>
+                <div onClick={handleCanceledAnnouncement} className=' bg-yellow-600 p-1 rounded text-white cursor-pointer '>
                 Cancelar
                 </div> : ''}
             </div>

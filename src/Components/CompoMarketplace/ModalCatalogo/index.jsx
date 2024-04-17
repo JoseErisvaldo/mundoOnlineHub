@@ -35,7 +35,6 @@ export default function ModalCatalogo({ id, user_id }) {
   const [idRequestFavorite, setIdRequestFavorite] = useState([]);
   const [isFavorite, setIsFavorite] = useState(false);
   const [listRemoveFavorite, setListRemoveFavorite] = useState([]);
-
   const openModal = () => setModalIsOpen(true);
   const closeModal = () => setModalIsOpen(false);
 
@@ -71,6 +70,8 @@ export default function ModalCatalogo({ id, user_id }) {
         .from("affiliate")
         .select("*")
         .eq("canceled", false)
+        .eq('affiliate', true)
+        .eq('request', false)
       if (error) throw error;
       return data;
     } catch (error) {
@@ -88,6 +89,8 @@ export default function ModalCatalogo({ id, user_id }) {
           fetchUser(),
           fetchAffiliate(),
         ]);
+        
+        setIdAffiliate(affiliateData)
 
         const productsUser = productsData.map((product) => {
           const user = userData.find((user) => user.user_id === product.user_id);
@@ -98,7 +101,6 @@ export default function ModalCatalogo({ id, user_id }) {
 
         setMyAnnounce(myProducts);
         setDisplay(productsUser);
-        console.log(productsUser)
         affiliateData.forEach((item) => {
           if (item.user_id_request === userSolicitation && item.idproduct === id) {
             setContenList(true);
@@ -206,7 +208,7 @@ export default function ModalCatalogo({ id, user_id }) {
           request: false,
           datecanceled: new Date(),
         })
-        .eq("user_id_request", userSolicitation)
+        .eq("id", idAffiliate[0].id)
         .select();
         setAlert({ message: "Cancelamento Enviada !", color: "red" });
         setTimeout(() => {

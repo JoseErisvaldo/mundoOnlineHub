@@ -72,7 +72,7 @@ export default function ModalMyAffiliates({isModal, closeModal, dados}) {
     try {
       const {data, error} = await supabase
     .from('affiliate')
-    .update({canceled: true, datecanceled: new Date()})
+    .update({canceled: true, affiliate: false, datecanceled: new Date()})
     .eq('id', dados.ID)
     .select()
 

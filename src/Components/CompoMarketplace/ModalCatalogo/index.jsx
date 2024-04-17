@@ -70,8 +70,6 @@ export default function ModalCatalogo({ id, user_id }) {
         .from("affiliate")
         .select("*")
         .eq("canceled", false)
-        .eq('affiliate', true)
-        .eq('request', false)
       if (error) throw error;
       return data;
     } catch (error) {
@@ -102,6 +100,7 @@ export default function ModalCatalogo({ id, user_id }) {
         setMyAnnounce(myProducts);
         setDisplay(productsUser);
         affiliateData.forEach((item) => {
+          console.log(item)
           if (item.user_id_request === userSolicitation && item.idproduct === id) {
             setContenList(true);
           }

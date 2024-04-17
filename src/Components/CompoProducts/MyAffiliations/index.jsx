@@ -36,7 +36,7 @@ export default function MyAffiliations() {
       .eq('user_id_request', user.user.id)
       .eq('request', false)
       .eq('affiliate', true)
-      .eq('canceled', false)
+      /*.eq('canceled', false)*/
       .then(({data, error}) => {
         if(error) {
           reject('Error', error)
